@@ -25,6 +25,7 @@ function main_showContentThisFrame()
 			TriggerServerEvent("epyi_mapeditor:getMapsList")
 		end
 	end, _var.menus.editor.objects.mainMaps)
+	RageUI.ButtonWithStyle(_U("main_menu_entities"), _U("main_menu_entities_desc"), { RightLabel = "→" }, true, function(_h, _a, _s) end, _var.menus.editor.objects.mainEntities)
 	RageUI.ButtonWithStyle(_U("main_menu_metadata"), _U("main_menu_metadata_desc"), { RightLabel = "→" }, true, function(_h, _a, _s) end, _var.menus.editor.objects.mainMetadata)
 	RageUI.ButtonWithStyle(_U("main_menu_settings"), _U("main_menu_settings_desc"), { RightLabel = "→" }, true, function(_h, _a, _s) end, _var.menus.editor.objects.mainSettings)
 end

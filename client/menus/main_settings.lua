@@ -1,6 +1,9 @@
 ---main_settings_showContentThisFrame → Function to show the main/settings menu content
 ---@return void
 function main_settings_showContentThisFrame()
+	RageUI.Checkbox(_U("main_settings_gizmo"), _U("main_settings_gizmo_desc"), _var.settings.useGizmo, {}, function(_h, _a, _s, Checked)
+		_var.settings.useGizmo = Checked
+	end)
 	RageUI.Checkbox(_U("main_settings_radar"), _U("main_settings_radar_desc"), _var.settings.showRadar, {}, function(_h, _a, _s, Checked)
 		_var.settings.showRadar = Checked
 	end)
@@ -11,8 +14,9 @@ function main_settings_showContentThisFrame()
 		_var.settings.show3DCursor = Checked
 	end)
 	RageUI.List(_U("main_settings_camera_speed"), _var.menu.cameraSpeedArray, _var.menu.cameraSpeedArrayIndex, _U("main_settings_camera_speed_desc"), {}, true, function(_h, _a, _s, Index)
-		_var.menu.cameraSpeedArrayIndex = Index
-		_var.settings.cameraSpeed = (2 * (Index - 1) / (#_var.menu.cameraSpeedArray - 1)) + 0.05
+		if Index ~= _var.menu.cameraSpeedArrayIndex then
+			setCameraSpeedIndex(Index)
+		end
 	end)
 	RageUI.Checkbox(_U("main_settings_instructional_buttons"), _U("main_settings_instructional_buttons_desc"), _var.settings.showInstructionalButtons, {}, function(_h, _a, _s, Checked)
 		_var.settings.showInstructionalButtons = Checked
