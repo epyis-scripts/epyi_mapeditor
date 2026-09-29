@@ -14,6 +14,7 @@ locales["en"] = {
 	-- Keys
 	["keys_menu_description"] = "~r~Open map editor menu",
 	["keys_gizmo_description"] = "~r~Map editor~s~: drag the gizmo",
+	["keys_gizmo_mode_description"] = "~r~Map editor~s~: switch the gizmo between move and rotate",
 	["keys_look_description"] = "~r~Map editor~s~: look around when an entity is selected",
 
 	-- Global
@@ -154,6 +155,10 @@ locales["en"] = {
 	["vehicles_category_class"] = "Class %s",
 
 	-- Elements → Entity menu
+	["entity_gizmo_mode"] = "Gizmo mode",
+	["entity_gizmo_mode_desc"] = "Move or rotate the entity with the gizmo",
+	["entity_relative_axes"] = "Relative axes",
+	["entity_relative_axes_desc"] = "Move and rotate the entity along its own axes (world axes otherwise)",
 	["entity_position"] = "Position %s",
 	["entity_position_desc"] = "Set the exact position of the entity on the %s axis",
 	["entity_rotation"] = "Rotation %s",

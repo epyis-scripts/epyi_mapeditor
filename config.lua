@@ -17,6 +17,7 @@ Config.Keys = { -- [table] → The keys (they can be changed by each player in t
 	Menu = "F9", -- [string] → Open the map editor menu
 	Gizmo = "MOUSE_LEFT", -- [string] → Drag the gizmo of the selected entity
 	LookAround = "MOUSE_RIGHT", -- [string] → Hold to look around when an entity is selected
+	GizmoMode = "TAB", -- [string] → Switch the gizmo between move and rotate
 }
 
 Config.Permissions = {
@@ -58,8 +59,6 @@ Config.Controls = { -- [table] → Editor controls (list of controls: https://do
 	ScrollDown = 242, -- [integer] → Decrease the camera speed, or rotate the object being added (default: MOUSE WHEEL DOWN)
 	DeselectEntity = 200, -- [integer] → Deselect the selected entity (default: ESC)
 	EditEntity = 176, -- [integer] → Open the menu of the selected entity (default: ENTER)
-	GizmoMode = 37, -- [integer] → Switch the gizmo between translation and rotation (default: TAB)
-	LookAround = 25, -- [integer] → Only used to show the look around key (the key is Config.Keys.LookAround)
 	FreemoveEntity = 47, -- [integer] → Hold to move the selected entity to the crosshair (default: G)
 	SnapToGround = 20, -- [integer] → Put the selected entity on the ground (default: Z)
 	DeleteEntity = 256, -- [integer] → Delete the selected entity (default: DELETE)

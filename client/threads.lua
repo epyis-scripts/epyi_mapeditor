@@ -215,8 +215,8 @@ _threads.editor.update = function()
 				{ getInstructionalButton(Config.Controls.RotateACW), _U("button_rotate_axis", _U("rotation_mode_" .. _var.editor.rotationModes[_var.editor.rotationModeIndex])) },
 			}
 			if _var.settings.useGizmo then
-				table.insert(buttons, { getInstructionalButton(Config.Controls.LookAround), _U("button_look_around") })
-				table.insert(buttons, { getInstructionalButton(Config.Controls.GizmoMode), _U("button_gizmo_mode", _U("gizmo_mode_" .. _var.editor.gizmo.mode)) })
+				table.insert(buttons, { getKeyMappingButton("+epyi_mapeditor_look"), _U("button_look_around") })
+				table.insert(buttons, { getKeyMappingButton("epyi_mapeditor_gizmo_mode"), _U("button_gizmo_mode", _U("gizmo_mode_" .. _var.editor.gizmo.mode)) })
 			end
 		end
 		local signature = ""
@@ -459,11 +459,6 @@ _threads.editor.update = function()
 		if isControlJustPressed(Config.Controls.EditEntity) then
 			openSpawnMenuNextFrame("entity")
 			return
-		end
-
-		-- Gizmo mode (translation - rotation)
-		if _var.settings.useGizmo and isControlJustPressed(Config.Controls.GizmoMode) then
-			setGizmoMode(_var.editor.gizmo.mode == "translate" and "rotate" or "translate")
 		end
 
 		-- Translation mode (relative - absolute)

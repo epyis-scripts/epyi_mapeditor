@@ -17,6 +17,15 @@ end, false)
 RegisterKeyMapping("+epyi_mapeditor_gizmo", _("keys_gizmo_description"), "MOUSE_BUTTON", Config.Keys.Gizmo)
 
 -- Key registering
+-- register the key used to switch the gizmo between move and rotate
+RegisterCommand("epyi_mapeditor_gizmo_mode", function()
+	if _var.editor.state == _var.editor.states.selected and _var.settings.useGizmo then
+		setGizmoMode(_var.editor.gizmo.mode == "translate" and "rotate" or "translate")
+	end
+end, false)
+RegisterKeyMapping("epyi_mapeditor_gizmo_mode", _("keys_gizmo_mode_description"), "keyboard", Config.Keys.GizmoMode)
+
+-- Key registering
 -- register the mouse button used to look around when the cursor is shown
 RegisterCommand("+epyi_mapeditor_look", function()
 	_var.editor.isLooking = true

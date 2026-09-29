@@ -16,6 +16,12 @@ local function askNumber(title, value)
 	return number
 end
 
+---gizmoModesLabels → Get the labels of the gizmo modes
+---@return table
+function gizmoModesLabels()
+	return { _U("gizmo_mode_translate"), _U("gizmo_mode_rotate") }
+end
+
 ---getEntityName → Get the name of a map entity
 ---@param record table
 ---@return string
@@ -45,6 +51,16 @@ function entity_showContentThisFrame()
 	local position = GetEntityCoords(handle)
 	local rotation = GetEntityRotation(handle, 2)
 	RageUI.Separator(_U("entity_type_" .. selected.type) .. " ~r~" .. getEntityName(selected))
+
+	-- Gizmo
+	if _var.settings.useGizmo then
+		RageUI.List(_U("entity_gizmo_mode"), gizmoModesLabels(), _var.editor.gizmo.mode == "rotate" and 2 or 1, _U("entity_gizmo_mode_desc"), {}, true, function() end, function(Index)
+			setGizmoMode(Index == 2 and "rotate" or "translate")
+		end)
+	end
+	RageUI.Checkbox(_U("entity_relative_axes"), _U("entity_relative_axes_desc"), _var.settings.relativeTranslation, {}, function(_h, _a, _s, Checked)
+		_var.settings.relativeTranslation = Checked
+	end)
 
 	-- Position and rotation
 	for _, axis in ipairs(axes) do

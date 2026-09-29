@@ -14,6 +14,7 @@ locales["fr"] = {
 	-- Keys
 	["keys_menu_description"] = "~r~Ouvrir le menu de l'éditeur de map",
 	["keys_gizmo_description"] = "~r~Map editor~s~ : déplacer le gizmo",
+	["keys_gizmo_mode_description"] = "~r~Map editor~s~ : basculer le gizmo entre déplacer et tourner",
 	["keys_look_description"] = "~r~Map editor~s~ : regarder autour quand une entité est sélectionnée",
 
 	-- Global
@@ -154,6 +155,10 @@ locales["fr"] = {
 	["vehicles_category_class"] = "Classe %s",
 
 	-- Elements → Entity menu
+	["entity_gizmo_mode"] = "Mode du gizmo",
+	["entity_gizmo_mode_desc"] = "Déplacer ou tourner l'entité avec le gizmo",
+	["entity_relative_axes"] = "Axes relatifs",
+	["entity_relative_axes_desc"] = "Déplacer et tourner l'entité selon ses propres axes (axes du monde sinon)",
 	["entity_position"] = "Position %s",
 	["entity_position_desc"] = "Définir la position exacte de l'entité sur l'axe %s",
 	["entity_rotation"] = "Rotation %s",

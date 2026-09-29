@@ -73,6 +73,13 @@ function getInstructionalButton(control)
 	return GetControlInstructionalButton(1, control, true)
 end
 
+---getKeyMappingButton → Get the instructional button string of the key bound to a key mapping command
+---@param command string
+---@return string
+function getKeyMappingButton(command)
+	return GetControlInstructionalButton(0, joaat(command) | 0x80000000, true)
+end
+
 ---getControlHelpToken → Get the help text token of a control (the key icon, or the key name if the control is unknown)
 ---@param control integer
 ---@return string
@@ -399,6 +406,7 @@ function setCursorMode(enabled)
 	_var.editor.cursorMode = enabled
 	if enabled then
 		EnterCursorMode()
+		setGizmoMode(_var.editor.gizmo.mode) -- the gizmo mode is shared by all the resources, apply the editor mode again
 	else
 		ExecuteCommand("-gizmoSelect")
 		LeaveCursorMode()
