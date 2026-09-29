@@ -7,6 +7,7 @@ local function loadPropsList()
 	if _var.props.list then
 		return
 	end
+	loadCreatorTexts()
 	_var.props.list = {}
 	_var.props.byModel = {}
 	_var.props.coloredFamilies = {}
@@ -146,7 +147,7 @@ function cancelObjectAdding(reopenMenu)
 	_var.editor.selected = nil
 	_var.editor.state = _var.editor.states.flying
 	if reopenMenu then
-		openSpawnMenu("objects")
+		openSpawnMenuNextFrame("objects")
 	end
 end
 

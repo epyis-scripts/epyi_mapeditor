@@ -266,15 +266,22 @@ end
 ---@param model string
 ---@return void
 function mapReplacePropModel(record, model)
+	record.replaceRequestId = (record.replaceRequestId or 0) + 1
+	local requestId = record.replaceRequestId
 	Citizen.CreateThread(function()
-		if not DoesEntityExist(record.handle) then
+		local oldHandle = record.handle
+		if not DoesEntityExist(oldHandle) then
 			return
 		end
-		local position = GetEntityCoords(record.handle)
-		local rotation = GetEntityRotation(record.handle, 2)
+		local position = GetEntityCoords(oldHandle)
+		local rotation = GetEntityRotation(oldHandle, 2)
 		local newRecord = createProp(model, position, rotation, record.textureVariant, _var.settings.networkObjects, false)
 		if not newRecord then
 			showNotification(_U("notif_entity_not_created"), 6)
+			return
+		end
+		if requestId ~= record.replaceRequestId or record.handle ~= oldHandle or not DoesEntityExist(oldHandle) then -- if the prop has been changed or deleted in the meantime
+			deleteMapEntity(newRecord)
 			return
 		end
 		local isInMap = mapContainsEntity(record)
