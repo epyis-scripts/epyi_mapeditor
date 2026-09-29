@@ -48,7 +48,7 @@ function getMapsFiles()
 	end
 	local folder = GetResourcePath(GetCurrentResourceName()) .. "/" .. _var.maps.folder
 	local command
-	if package.config:sub(1, 1) == "\\" then -- if the server runs on windows
+	if folder:match("^%a:[/\\]") then -- if the server runs on windows
 		command = 'dir "' .. folder:gsub("/", "\\") .. '" /b /a-d 2>nul'
 	else
 		command = 'ls -1 "' .. folder .. '" 2>/dev/null'
