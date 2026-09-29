@@ -30,6 +30,7 @@ function openMenu()
 	-- Check if the menu is already opened
 	if _var.menus.editor.isOpened then
 		_var.menus.editor.isOpened = false
+		_var.menus.editor.closedFrame = GetFrameCount()
 		return
 	end
 
@@ -45,6 +46,7 @@ function openMenu()
 
 	_var.menus.editor.objects.main.Closed = function()
 		_var.menus.editor.isOpened = false
+		_var.menus.editor.closedFrame = GetFrameCount()
 	end
 
 	_var.menus.editor.objects.mainMaps = RageUI.CreateSubMenu(_var.menus.editor.objects.main, _U("menu_title"), _U("main_maps_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)

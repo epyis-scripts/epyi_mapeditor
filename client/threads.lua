@@ -7,6 +7,7 @@ _threads = {
 -- Thread initialization
 -- Thread → Freecam
 _threads.freecam.isActivated = false
+_threads.freecam.generation = 0
 _threads.freecam.enable = function()
 	if _threads.freecam.isActivated then
 		return
@@ -22,8 +23,10 @@ _threads.freecam.enable = function()
 	SetEntityVisible(ped, false, false)
 	SetEntityCollision(ped, false, false)
 	SetEntityInvincible(ped, true)
+	_threads.freecam.generation = _threads.freecam.generation + 1
+	local generation = _threads.freecam.generation
 	Citizen.CreateThread(function()
-		while _threads.freecam.isActivated do
+		while _threads.freecam.isActivated and generation == _threads.freecam.generation do
 			if not _var.freecam.isPaused then
 				_threads.freecam.update()
 			end
@@ -116,13 +119,16 @@ end
 -- Thread initialization
 -- Thread → Editor
 _threads.editor.isActivated = false
+_threads.editor.generation = 0
 _threads.editor.enable = function()
 	if _threads.editor.isActivated then
 		return
 	end
 	_threads.editor.isActivated = true
+	_threads.editor.generation = _threads.editor.generation + 1
+	local generation = _threads.editor.generation
 	Citizen.CreateThread(function()
-		while _threads.editor.isActivated do
+		while _threads.editor.isActivated and generation == _threads.editor.generation do
 			_threads.editor.update()
 			Citizen.Wait(0)
 		end
@@ -313,13 +319,17 @@ _threads.editor.update = function()
 	end
 
 	-- Controls
-	if _var.menus.editor.isOpened or _var.freecam.isPaused then
+	if _var.menus.editor.isOpened or _var.freecam.isPaused or GetFrameCount() - _var.menus.editor.closedFrame <= 1 then
 		return
 	end
 	if _var.editor.state == states.flying then
 		if isControlJustPressed(Config.Controls.SelectEntity) and hitEntity then
 			local record = mapFindEntity(hitEntity)
 			if record then
+				closeSpawnMenu()
+				if record.type ~= "prop" then
+					setupEditorEntity(record)
+				end
 				_var.editor.selected = record
 				_var.editor.state = states.selected
 			end
@@ -549,6 +559,9 @@ end
 ---@param handle integer
 ---@return void
 function alignEntity(handle)
+	if not _var.editor.ray.hit then
+		return
+	end
 	if _var.editor.ray.entity then
 		copyEntityQuaternion(_var.editor.ray.entity, handle)
 	else
