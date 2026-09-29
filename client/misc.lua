@@ -37,8 +37,8 @@ end
 ---@return void
 function showHelpText(text)
 	BeginTextCommandDisplayHelp("CELL_EMAIL_BCON")
-	for index = 1, #text, 99 do
-		AddTextComponentSubstringPlayerName(text:sub(index, index + 98))
+	for line in text:gmatch("[^\n]+\n?") do -- one text component per line, to never split a token
+		AddTextComponentSubstringPlayerName(line)
 	end
 	EndTextCommandDisplayHelp(0, false, false, -1)
 end
@@ -99,7 +99,11 @@ end
 ---@param hash integer
 ---@return integer
 function toSignedHash(hash)
-	hash = math.tointeger(hash) & 0xFFFFFFFF
+	hash = math.tointeger(math.floor(hash))
+	if not hash then
+		return 0
+	end
+	hash = hash & 0xFFFFFFFF
 	if hash >= 0x80000000 then
 		hash = hash - 0x100000000
 	end
@@ -247,7 +251,10 @@ end
 ---@param entity integer
 ---@return vector3, vector3, vector3
 function getEntityVectors(entity)
-	local right, forward, up = GetEntityMatrix(entity)
+	local position = GetEntityCoords(entity)
+	local right = GetOffsetFromEntityInWorldCoords(entity, 1.0, 0.0, 0.0) - position
+	local forward = GetOffsetFromEntityInWorldCoords(entity, 0.0, 1.0, 0.0) - position
+	local up = GetOffsetFromEntityInWorldCoords(entity, 0.0, 0.0, 1.0) - position
 	return right, forward, up
 end
 

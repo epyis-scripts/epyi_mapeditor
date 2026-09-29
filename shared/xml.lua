@@ -11,10 +11,12 @@ local xmlEntities = {
 ---@return string
 local function xmlUnescape(value)
 	value = value:gsub("&#x(%x+);", function(code)
-		return utf8.char(tonumber(code, 16))
+		local number = tonumber(code, 16)
+		return (number and number <= 0x10FFFF) and utf8.char(number) or nil
 	end)
 	value = value:gsub("&#(%d+);", function(code)
-		return utf8.char(tonumber(code))
+		local number = tonumber(code)
+		return (number and number <= 0x10FFFF) and utf8.char(number) or nil
 	end)
 	return (value:gsub("&%a+;", xmlEntities))
 end

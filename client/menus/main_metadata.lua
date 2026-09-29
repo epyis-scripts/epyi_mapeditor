@@ -3,7 +3,10 @@
 ---@param length integer
 ---@return string
 local function truncate(text, length)
-	if #text > length then
+	local textLength = utf8.len(text)
+	if textLength and textLength > length then
+		return text:sub(1, utf8.offset(text, length + 1) - 1) .. "..."
+	elseif not textLength and #text > length then
 		return text:sub(1, length) .. "..."
 	end
 	return text
