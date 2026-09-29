@@ -24,13 +24,13 @@
   - **LEFT MOUSE BUTTON/ENTER** → place, hold **LEFT SHIFT** while placing to keep adding the same object
   - **Q/E** or **MOUSE WHEEL** → rotate, **X** → align on the surface, **ESC** → cancel
 - When an entity is selected:
-  - Drag the **3D gizmo** with the mouse cursor, **TAB** → move/rotate gizmo, hold **RIGHT MOUSE BUTTON** → look around
-  - **ENTER** → entity menu (exact position and rotation, color, put on the ground, duplicate, delete)
+  - Drag the **3D gizmo** with the mouse cursor, **TAB** → switch the gizmo between move and rotate, hold **RIGHT MOUSE BUTTON** → look around
+  - **ENTER** → entity menu (gizmo mode, relative axes, exact position and rotation, color, put on the ground, duplicate, delete)
   - **ARROWS** → move on X/Y, **R/F** → move on Z, **Q/E** → rotate, hold **G** → move to the crosshair, **Z** → put on the ground
   - **1** → relative/world axes, **2** → rotation axis, **3** → rotate over 15°, **C + ARROW UP/DOWN** → clone
   - **DELETE** → delete, **ESC** → deselect
 - **LEFT SHIFT** → go faster, **LEFT ALT** → go slower
-- The editor controls can be changed in the **config.lua** file, and the mouse buttons in the FiveM key bindings settings
+- The editor controls can be changed in the **config.lua** file, and the gizmo keys (mouse buttons and **TAB**) in the FiveM key bindings settings
 ## 🗺️ Maps
 - The maps are saved in the **maps** folder of the resource, in the **5me** xml format (the file name is the map name, without accents and special characters)
 - The editor can also load the maps of the **Guadmaz's Map Editor** and the **races** in the 5me format
