@@ -30,7 +30,7 @@ function openMenu()
 	-- Check if the menu is already opened
 	if _var.menus.editor.isOpened then
 		_var.menus.editor.isOpened = false
-		_var.menus.editor.closedFrame = GetFrameCount()
+		_var.menus.closedFrame = GetFrameCount()
 		return
 	end
 
@@ -46,12 +46,13 @@ function openMenu()
 
 	_var.menus.editor.objects.main.Closed = function()
 		_var.menus.editor.isOpened = false
-		_var.menus.editor.closedFrame = GetFrameCount()
+		_var.menus.closedFrame = GetFrameCount()
 	end
 
 	_var.menus.editor.objects.mainMaps = RageUI.CreateSubMenu(_var.menus.editor.objects.main, _U("menu_title"), _U("main_maps_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
 	_var.menus.editor.objects.mainMetadata = RageUI.CreateSubMenu(_var.menus.editor.objects.main, _U("menu_title"), _U("main_metadata_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
 	_var.menus.editor.objects.mainSettings = RageUI.CreateSubMenu(_var.menus.editor.objects.main, _U("menu_title"), _U("main_settings_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
+	_var.menus.editor.objects.mainEntities = RageUI.CreateSubMenu(_var.menus.editor.objects.main, _U("menu_title"), _U("main_entities_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
 
 	applyMenuStyle(_var.menus.editor.objects)
 
@@ -72,6 +73,9 @@ function openMenu()
 		RageUI.IsVisible(_var.menus.editor.objects.mainSettings, true, Config.MenuStyle.BannerStyle.UseGlareEffect, Config.MenuStyle.BannerStyle.UseInstructionalButtons, function()
 			main_settings_showContentThisFrame()
 		end)
+		RageUI.IsVisible(_var.menus.editor.objects.mainEntities, true, Config.MenuStyle.BannerStyle.UseGlareEffect, Config.MenuStyle.BannerStyle.UseInstructionalButtons, function()
+			main_entities_showContentThisFrame()
+		end)
 		Citizen.Wait(0)
 	end
 	if isEditorMenuVisible() then
@@ -88,6 +92,15 @@ function isEditorMenuVisible()
 		end
 	end
 	return false
+end
+
+---resetMenuPosition → Go back to the first item of a menu
+---@param menu table
+---@return void
+function resetMenuPosition(menu)
+	menu.Index = 1
+	menu.Pagination.Minimum = 1
+	menu.Pagination.Maximum = menu.Pagination.Total
 end
 
 ---initSpawnMenus → Create the menus used to add entities in the map
@@ -109,9 +122,12 @@ local function initSpawnMenus()
 	_var.menus.spawn.objects.objects = RageUI.CreateMenu(_("menu_title"), _("objects_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
 	_var.menus.spawn.objects.peds = RageUI.CreateMenu(_("menu_title"), _("peds_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
 	_var.menus.spawn.objects.vehicles = RageUI.CreateMenu(_("menu_title"), _("vehicles_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
+	_var.menus.spawn.objects.entity = RageUI.CreateMenu(_("menu_title"), _("entity_subtitle"), Config.MenuStyle.Margins.left, Config.MenuStyle.Margins.top, _var.menus.editor.bannerTexture, _var.menus.editor.bannerTexture)
 
-	_var.menus.spawn.objects.objects.Closed = function()
-		cancelObjectAdding()
+	for _k, rageObject in pairs(_var.menus.spawn.objects) do
+		rageObject.Closed = function()
+			_var.menus.closedFrame = GetFrameCount()
+		end
 	end
 
 	applyMenuStyle(_var.menus.spawn.objects)
@@ -122,8 +138,20 @@ end
 ---@return void
 function openSpawnMenu(name)
 	initSpawnMenus()
+	saveSpawnMenuIndex()
 	_var.menus.spawn.current = name
-	RageUI.Visible(_var.menus.spawn.objects[name], true)
+	local menu = _var.menus.spawn.objects[name]
+	RageUI.Visible(menu, true)
+
+	-- Restore the position of the menu when it has been closed by an action
+	local savedIndex = _var.menus.spawn.savedIndexes[name]
+	if savedIndex and name ~= "entity" then
+		menu.Index = savedIndex.index
+		menu.Pagination.Minimum = savedIndex.minimum
+		menu.Pagination.Maximum = savedIndex.maximum
+	else
+		resetMenuPosition(menu)
+	end
 
 	-- Check if the menu pool is already running
 	if _var.menus.spawn.isOpened then
@@ -142,6 +170,9 @@ function openSpawnMenu(name)
 			end)
 			RageUI.IsVisible(_var.menus.spawn.objects.vehicles, true, Config.MenuStyle.BannerStyle.UseGlareEffect, Config.MenuStyle.BannerStyle.UseInstructionalButtons, function()
 				vehicles_showContentThisFrame()
+			end)
+			RageUI.IsVisible(_var.menus.spawn.objects.entity, true, Config.MenuStyle.BannerStyle.UseGlareEffect, Config.MenuStyle.BannerStyle.UseInstructionalButtons, function()
+				entity_showContentThisFrame()
 			end)
 			if not isSpawnMenuVisible() then
 				_var.menus.spawn.isOpened = false
@@ -163,11 +194,35 @@ function isSpawnMenuVisible()
 	return false
 end
 
+---saveSpawnMenuIndex → Save the position of the visible spawn menu, to restore it when the menu is opened again
+---@return void
+function saveSpawnMenuIndex()
+	for name, rageObject in pairs(_var.menus.spawn.objects) do
+		if RageUI.Visible(rageObject) then
+			_var.menus.spawn.savedIndexes[name] = {
+				index = rageObject.Index,
+				minimum = rageObject.Pagination.Minimum,
+				maximum = rageObject.Pagination.Maximum,
+			}
+		end
+	end
+end
+
+---resetSpawnMenuIndex → Go back to the first item of a spawn menu (used when its filters change)
+---@param name string
+---@return void
+function resetSpawnMenuIndex(name)
+	resetMenuPosition(_var.menus.spawn.objects[name])
+	_var.menus.spawn.savedIndexes[name] = nil
+end
+
 ---closeSpawnMenu → Close the menu used to add entities without cancelling the action
 ---@return void
 function closeSpawnMenu()
 	if isSpawnMenuVisible() then
+		saveSpawnMenuIndex()
 		RageUI.CloseAll()
+		_var.menus.closedFrame = GetFrameCount()
 	end
 	_var.menus.spawn.isOpened = false
 end
