@@ -25,6 +25,7 @@ Config.Permissions = {
 Config.Maps = {
 	RefreshInterval = 5000, -- [integer] → Interval in milliseconds between two checks of the maps folder
 	MaxSize = 5000000, -- [integer] → Maximum size in characters of a map sent to the server
+	TransferSpeed = 500000, -- [integer] → Speed in bytes per second of the maps transfers between the server and the clients
 }
 
 Config.Settings = { -- [table] → Default editor settings (they can be changed in game in the settings menu)

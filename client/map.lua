@@ -361,10 +361,11 @@ local function loadFiveMapEditorProps(element, result, isNetwork)
 		local position, rotation = xmlVector(prop, "Pos"), xmlVector(prop, "Rot")
 		local hash = tonumber(xmlValue(prop, "Hash"))
 		if hash and position and rotation then
-			local record = createProp(hash, position, rotation, tonumber(xmlValue(prop, "Color")) or 0, isNetwork, false)
+			local record = createProp(hash, position, rotation, math.floor(tonumber(xmlValue(prop, "Color")) or 0), isNetwork, false)
 			if record then
 				local sba = tonumber(xmlValue(prop, "SBA"))
 				if sba then
+					sba = math.floor(sba)
 					record.sba = sba
 					setPropSpeedBoost(record.handle, sba)
 				end
@@ -416,7 +417,8 @@ function mapLoadFromXml(data, isNetwork)
 			local position, rotation = xmlVector(ped, "Pos"), xmlVector(ped, "Rot")
 			local hash = tonumber(xmlValue(ped, "Hash"))
 			if hash and position and rotation then
-				local record = createPed(hash, position, rotation.z, tonumber(xmlValue(ped, "Type")), isNetwork)
+				local pedType = tonumber(xmlValue(ped, "Type"))
+				local record = createPed(hash, position, rotation.z, pedType and math.floor(pedType), isNetwork)
 				if record then
 					table.insert(result.entities, record)
 				end
@@ -454,18 +456,40 @@ function mapLoadFromXml(data, isNetwork)
 	return result
 end
 
+---unloadLoadedMap → Delete the entities and checkpoints created by mapLoadFromXml
+---@param result table
+---@return void
+function unloadLoadedMap(result)
+	for _, record in ipairs(result.entities) do
+		deleteMapEntity(record)
+	end
+	for _, checkpoint in ipairs(result.checkpoints) do
+		DeleteCheckpoint(checkpoint)
+	end
+end
+
 ---loadMapInEditor → Replace the current map of the editor by a map from its xml
 ---@param data string
 ---@return void
 function loadMapInEditor(data)
+	_var.map.loadRequestId = _var.map.loadRequestId + 1
+	local requestId = _var.map.loadRequestId
 	Citizen.CreateThread(function()
 		resetEditorSelection()
 		mapUnload()
 		local result = mapLoadFromXml(data, _var.settings.networkObjects)
+		if requestId ~= _var.map.loadRequestId then -- if another map has been loaded in the meantime
+			if result then
+				unloadLoadedMap(result)
+			end
+			return
+		end
 		if not result then
 			showNotification(_U("notif_map_load_error"), 6)
 			return
 		end
+		resetEditorSelection()
+		mapUnload()
 		mapNew()
 		_var.map.current.name = result.name ~= "" and result.name or _var.map.current.name
 		_var.map.current.creator = result.creator ~= "" and result.creator or _var.map.current.creator
@@ -492,14 +516,14 @@ end
 ---saveMap → Send the current map to the server to save it
 ---@return void
 function saveMap()
-	TriggerServerEvent("epyi_mapeditor:saveMap", mapSerialize())
+	TriggerLatentServerEvent("epyi_mapeditor:saveMap", Config.Maps.TransferSpeed, mapSerialize())
 end
 
 ---loadMap → Load a map in the world outside of the editor (used by the exports)
 ---@param data string
 ---@return string|nil
 function loadMap(data)
-	local result = mapLoadFromXml(data, _var.settings.networkObjects)
+	local result = mapLoadFromXml(data, false)
 	if not result then
 		return nil
 	end
@@ -518,12 +542,7 @@ function unloadMap(mapId)
 	if not map then
 		return
 	end
-	for _, record in ipairs(map.entities) do
-		deleteMapEntity(record)
-	end
-	for _, checkpoint in ipairs(map.checkpoints) do
-		DeleteCheckpoint(checkpoint)
-	end
+	unloadLoadedMap(map)
 	_var.loader.maps[mapId] = nil
 end
 
