@@ -435,7 +435,8 @@ function drawGizmo(handle)
 	local forward, right, up, position = GetEntityMatrix(handle)
 	-- the matrix is given to the native as a mutable buffer: right, forward, up and position rows
 	local buffer = string.pack("<ffffffffffffffff", right.x, right.y, right.z, 0.0, forward.x, forward.y, forward.z, 0.0, up.x, up.y, up.z, 0.0, position.x, position.y, position.z, 1.0)
-	if not Citizen.InvokeNative(0xEB2EDCA2, buffer, "epyi_mapeditor", Citizen.ReturnResultAnyway()) then
+	local changed = Citizen.InvokeNative(0xEB2EDCA2, buffer, "epyi_mapeditor", Citizen.ResultAsInteger())
+	if changed ~= 1 then
 		return
 	end
 	local rx, ry, rz, _rw, fx, fy, fz, _fw, ux, uy, uz, _uw, px, py, pz = string.unpack("<ffffffffffffffff", buffer)
@@ -458,13 +459,17 @@ end
 ---syncGizmoSpace → Make the gizmo use the entity space if the translation is relative (the world space otherwise)
 ---@return void
 function syncGizmoSpace()
-	if _var.editor.gizmo.isLocal == _var.settings.relativeTranslation then
+	if _var.editor.gizmo.isLocal == _var.settings.relativeTranslation or _var.editor.gizmo.isToggling then
 		return
 	end
 	_var.editor.gizmo.isLocal = _var.settings.relativeTranslation
+	_var.editor.gizmo.isToggling = true
 	ExecuteCommand("+gizmoLocal")
 	Citizen.SetTimeout(100, function()
 		ExecuteCommand("-gizmoLocal")
+		Citizen.SetTimeout(100, function()
+			_var.editor.gizmo.isToggling = false
+		end)
 	end)
 end
 

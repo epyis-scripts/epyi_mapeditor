@@ -90,7 +90,7 @@ _threads.freecam.update = function()
 	-- Camera rotation control
 	local rightAxisX = GetDisabledControlNormal(0, 220)
 	local rightAxisY = GetDisabledControlNormal(0, 221)
-	if rightAxisX ~= 0.0 or rightAxisY ~= 0.0 then
+	if not _var.editor.cursorMode and (rightAxisX ~= 0.0 or rightAxisY ~= 0.0) then
 		local newX = math.max(-89.0, math.min(89.0, rotation.x - rightAxisY * _var.freecam.mouseSensitivity))
 		local newZ = rotation.z - rightAxisX * _var.freecam.mouseSensitivity
 		SetCamRot(cam, newX, 0.0, newZ, 2)
@@ -431,6 +431,7 @@ _threads.editor.update = function()
 			if _var.editor.selected and mapContainsEntity(_var.editor.selected) then
 				mapRemoveEntity(_var.editor.selected)
 			end
+			closeSpawnMenu()
 			_var.editor.selected = nil
 			_var.editor.state = states.flying
 			return
@@ -456,7 +457,7 @@ _threads.editor.update = function()
 
 		-- Entity menu
 		if isControlJustPressed(Config.Controls.EditEntity) then
-			openSpawnMenu("entity")
+			openSpawnMenuNextFrame("entity")
 			return
 		end
 
@@ -567,6 +568,7 @@ _threads.editor.disable = function()
 	_threads.editor.isActivated = false
 	_var.editor.state = _var.editor.states.inactive
 	_var.instructionnal.signature = nil
+	_var.editor.isLooking = false
 	setCursorMode(false)
 	setEntityOutline(nil)
 end
@@ -626,6 +628,7 @@ end
 function deselectEntity()
 	local selected = _var.editor.selected
 	deleteCursorProp()
+	_var.editor.isLooking = false
 	if selected and DoesEntityExist(selected.handle) and selected.type ~= "prop" then
 		FreezeEntityPosition(selected.handle, false)
 	end

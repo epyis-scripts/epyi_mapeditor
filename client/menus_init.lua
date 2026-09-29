@@ -9,6 +9,14 @@ if Config.MenuStyle.BannerStyle.ImageUrl ~= nil then
 	_var.menus.editor.bannerTexture = "custom_menu_header"
 end
 
+-- Menu controls initialization
+-- go back with ESC/BACKSPACE only (the default back control also uses the right mouse button, used to look around)
+RageUI.Settings.Controls.Back.Keys = {
+	{ 0, 202 },
+	{ 1, 202 },
+	{ 2, 202 },
+}
+
 ---applyMenuStyle → Apply the config style to some RageUI menus
 ---@param menus table
 ---@return void
@@ -94,6 +102,19 @@ function isEditorMenuVisible()
 	return false
 end
 
+---loadCreatorTexts → Load the game texts used by the R* creator (props and categories labels)
+---@return boolean
+function loadCreatorTexts()
+	if not HasThisAdditionalTextLoaded("FMMC", 7) then
+		RequestAdditionalText("FMMC", 7)
+		local timeout = GetGameTimer() + 5000
+		while not HasThisAdditionalTextLoaded("FMMC", 7) and GetGameTimer() < timeout do
+			Citizen.Wait(0)
+		end
+	end
+	return HasThisAdditionalTextLoaded("FMMC", 7)
+end
+
 ---resetMenuPosition → Go back to the first item of a menu
 ---@param menu table
 ---@return void
@@ -110,12 +131,7 @@ local function initSpawnMenus()
 		return
 	end
 
-	-- Load the game texts used by the R* creator
-	RequestAdditionalText("FMMC", 7)
-	local timeout = GetGameTimer() + 5000
-	while not HasThisAdditionalTextLoaded("FMMC", 7) and GetGameTimer() < timeout do
-		Citizen.Wait(0)
-	end
+	loadCreatorTexts()
 
 	-- RageUI menu initialization
 	-- init the rageui menu with the config parameters
@@ -126,6 +142,7 @@ local function initSpawnMenus()
 
 	for _k, rageObject in pairs(_var.menus.spawn.objects) do
 		rageObject.Closed = function()
+			saveSpawnMenuIndex()
 			_var.menus.closedFrame = GetFrameCount()
 		end
 	end
@@ -180,6 +197,16 @@ function openSpawnMenu(name)
 			Citizen.Wait(0)
 		end
 		_var.menus.spawn.current = nil
+	end)
+end
+
+---openSpawnMenuNextFrame → Open a spawn menu on the next frame (the key used to open it is not used by the menu)
+---@param name string
+---@return void
+function openSpawnMenuNextFrame(name)
+	Citizen.CreateThread(function()
+		Citizen.Wait(0)
+		openSpawnMenu(name)
 	end)
 end
 
