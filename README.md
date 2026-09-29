@@ -17,15 +17,20 @@
 6. **OPTIONAL →** Restrict the map editor with the ace permission **epyi_mapeditor.access** by setting **Config.Permissions.UseAce** to **true** and adding **add_ace group.admin epyi_mapeditor.access allow** in your server.cfg
 7. **OPTIONAL →** Set the language with **setr epyi_mapeditor:locale "fr"** in your server.cfg (available: **en**, **fr**)
 ## 🎮 Usage
-- Press **F9** to open the main menu, then **enter the editor** to fly with the camera
-- **F5** → add an object, **F6** → add a ped, **F7** → add a vehicle, **LEFT MOUSE BUTTON** → select an entity of the map
-- When adding an object: **Q/E** → rotate, **X** → align, **ENTER** → place
+- Press **F9** to open the main menu, then **enter the editor** to fly with the camera (**SPACE/LEFT CTRL** → up/down, **MOUSE WHEEL** → camera speed)
+- **F5** → objects, **F6** → peds, **F7** → vehicles: each list has a **search** and **categories** (with the **recently used** objects), and any object can be added with its **model name**
+- **LEFT MOUSE BUTTON** → select the entity under the crosshair, the **Entities of the map** menu lists and selects all the entities
+- When adding an object (it follows the crosshair):
+  - **LEFT MOUSE BUTTON/ENTER** → place, hold **LEFT SHIFT** while placing to keep adding the same object
+  - **Q/E** or **MOUSE WHEEL** → rotate, **X** → align on the surface, **ESC** → cancel
 - When an entity is selected:
-  - **ARROWS** → move on X/Y, **R/F** → move on Z, **Q/E** → rotate, **RIGHT MOUSE BUTTON** → drag with the cursor
-  - **1** → toggle relative/absolute translation, **2** → change the rotation axis, **3** → rotate over 15°
-  - **C + ARROW UP/DOWN** → clone, **DELETE** → delete, **ESC** → deselect
+  - Drag the **3D gizmo** with the mouse cursor, **TAB** → move/rotate gizmo, hold **RIGHT MOUSE BUTTON** → look around
+  - **ENTER** → entity menu (exact position and rotation, color, put on the ground, duplicate, delete)
+  - **ARROWS** → move on X/Y, **R/F** → move on Z, **Q/E** → rotate, hold **G** → move to the crosshair, **Z** → put on the ground
+  - **1** → relative/world axes, **2** → rotation axis, **3** → rotate over 15°, **C + ARROW UP/DOWN** → clone
+  - **DELETE** → delete, **ESC** → deselect
 - **LEFT SHIFT** → go faster, **LEFT ALT** → go slower
-- All the editor controls can be changed in the **config.lua** file
+- The editor controls can be changed in the **config.lua** file, and the mouse buttons in the FiveM key bindings settings
 ## 🗺️ Maps
 - The maps are saved in the **maps** folder of the resource, in the **5me** xml format (the file name is the map name, without accents and special characters)
 - The editor can also load the maps of the **Guadmaz's Map Editor** and the **races** in the 5me format
