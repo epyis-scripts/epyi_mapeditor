@@ -17,7 +17,7 @@
 6. **OPTIONAL →** Restrict the map editor with the ace permission **epyi_mapeditor.access** by setting **Config.Permissions.UseAce** to **true** and adding **add_ace group.admin epyi_mapeditor.access allow** in your server.cfg
 7. **OPTIONAL →** Set the language with **setr epyi_mapeditor:locale "fr"** in your server.cfg (available: **en**, **fr**)
 ## 🎮 Usage
-- Press **F10** to open the main menu, then **enter the editor** to fly with the camera
+- Press **F9** to open the main menu, then **enter the editor** to fly with the camera
 - **F5** → add an object, **F6** → add a ped, **F7** → add a vehicle, **LEFT MOUSE BUTTON** → select an entity of the map
 - When adding an object: **Q/E** → rotate, **X** → align, **ENTER** → place
 - When an entity is selected:

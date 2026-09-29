@@ -14,7 +14,7 @@ Config.MenuStyle = {
 }
 
 Config.Keys = { -- [table] → The menu keys
-	Menu = "F10",
+	Menu = "F9",
 }
 
 Config.Permissions = {
