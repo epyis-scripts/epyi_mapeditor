@@ -27,7 +27,7 @@
 - **LEFT SHIFT** → go faster, **LEFT ALT** → go slower
 - All the editor controls can be changed in the **config.lua** file
 ## 🗺️ Maps
-- The maps are saved in the **maps** folder of the resource, in the **5me** xml format
+- The maps are saved in the **maps** folder of the resource, in the **5me** xml format (the file name is the map name, without accents and special characters)
 - The editor can also load the maps of the **Guadmaz's Map Editor** and the **races** in the 5me format
 - The maps can be loaded in the world by the other resources with the client exports:
 ```lua
@@ -35,7 +35,7 @@ local mapId = exports["epyi_mapeditor"]:loadMap(xmlData) -- load a map from its 
 exports["epyi_mapeditor"]:unloadMap(mapId) -- unload a map
 exports["epyi_mapeditor"]:unloadAllMaps() -- unload all the maps
 ```
-- Or by the server with the client events **epyi_mapeditor:loader:load** (xml content), **epyi_mapeditor:loader:unload** (map id) and **epyi_mapeditor:loader:unloadAll**
+- Or by the server with the client events **epyi_mapeditor:loader:load** (xml content), **epyi_mapeditor:loader:unload** (map id) and **epyi_mapeditor:loader:unloadAll** (use **TriggerLatentClientEvent** to send big maps)
 ## 📜 License
     Copyright (C) 2026 Epyi's Scripts
 
