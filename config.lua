@@ -13,8 +13,10 @@ Config.MenuStyle = {
 	},
 }
 
-Config.Keys = { -- [table] → The menu keys
-	Menu = "F9",
+Config.Keys = { -- [table] → The keys (they can be changed by each player in the FiveM key bindings settings)
+	Menu = "F9", -- [string] → Open the map editor menu
+	Gizmo = "MOUSE_LEFT", -- [string] → Drag the gizmo of the selected entity
+	LookAround = "MOUSE_RIGHT", -- [string] → Hold to look around when an entity is selected
 }
 
 Config.Permissions = {
@@ -29,8 +31,9 @@ Config.Maps = {
 }
 
 Config.Settings = { -- [table] → Default editor settings (they can be changed in game in the settings menu)
+	UseGizmo = true, -- [boolean] → Show a 3D gizmo (with the mouse cursor) to move and rotate the selected entity
 	ShowRadar = true, -- [boolean] → Show the radar in the editor
-	ShowXYZAxis = true, -- [boolean] → Show the XYZ axes of the selected entity
+	ShowXYZAxis = true, -- [boolean] → Show the XYZ axes of the selected entity (only when the gizmo is disabled)
 	Show3DCursor = true, -- [boolean] → Show the 3D cursor
 	CameraSpeedIndex = 3, -- [integer] → Default camera speed (1: very slow, 2: slow, 3: normal, 4: fast, 5: very fast)
 	ShowInstructionalButtons = true, -- [boolean] → Show the editor instructionals buttons
@@ -46,11 +49,19 @@ Config.Controls = { -- [table] → Editor controls (list of controls: https://do
 	ObjectCreate = 166, -- [integer] → Add an object (default: F5)
 	PedCreate = 167, -- [integer] → Add a ped (default: F6)
 	VehicleCreate = 168, -- [integer] → Add a vehicle (default: F7)
-	SelectEntity = 24, -- [integer] → Select the entity under the cursor (default: LEFT MOUSE BUTTON)
-	AlignItem = 73, -- [integer] → Align the entity on the surface or the entity under the cursor (default: X)
+	SelectEntity = 24, -- [integer] → Select the entity under the crosshair, or place the object being added (default: LEFT MOUSE BUTTON)
+	AlignItem = 73, -- [integer] → Align the entity on the surface or the entity under the crosshair (default: X)
 	PlaceItem = 176, -- [integer] → Place the object being added (default: ENTER)
+	StampModifier = 21, -- [integer] → Hold while placing an object to keep adding the same object (default: LEFT SHIFT)
+	CancelAdding = 200, -- [integer] → Cancel the object being added (default: ESC)
+	ScrollUp = 241, -- [integer] → Increase the camera speed, or rotate the object being added (default: MOUSE WHEEL UP)
+	ScrollDown = 242, -- [integer] → Decrease the camera speed, or rotate the object being added (default: MOUSE WHEEL DOWN)
 	DeselectEntity = 200, -- [integer] → Deselect the selected entity (default: ESC)
-	FreemoveEntity = 25, -- [integer] → Drag the selected entity with the cursor (default: RIGHT MOUSE BUTTON)
+	EditEntity = 176, -- [integer] → Open the menu of the selected entity (default: ENTER)
+	GizmoMode = 37, -- [integer] → Switch the gizmo between translation and rotation (default: TAB)
+	LookAround = 25, -- [integer] → Only used to show the look around key (the key is Config.Keys.LookAround)
+	FreemoveEntity = 47, -- [integer] → Hold to move the selected entity to the crosshair (default: G)
+	SnapToGround = 20, -- [integer] → Put the selected entity on the ground (default: Z)
 	DeleteEntity = 256, -- [integer] → Delete the selected entity (default: DELETE)
 	CloneEntity = 26, -- [integer] → Hold and press the Y translation keys to clone the selected entity (default: C)
 	ChangeTranslationMode = 157, -- [integer] → Toggle the relative/absolute translation mode (default: 1)

@@ -389,6 +389,111 @@ function getPropColorLabels(model)
 	return _var.props.colorsByModel[getModelHash(model)] or {}
 end
 
+---setCursorMode → Show or hide the mouse cursor (used by the gizmo)
+---@param enabled boolean
+---@return void
+function setCursorMode(enabled)
+	if enabled == _var.editor.cursorMode then
+		return
+	end
+	_var.editor.cursorMode = enabled
+	if enabled then
+		EnterCursorMode()
+	else
+		ExecuteCommand("-gizmoSelect")
+		LeaveCursorMode()
+	end
+end
+
+---setEntityOutline → Draw the outline of an entity (only one entity can be outlined)
+---@param handle integer|nil
+---@return void
+function setEntityOutline(handle)
+	if handle == _var.editor.outlinedEntity then
+		return
+	end
+	if _var.editor.outlinedEntity and DoesEntityExist(_var.editor.outlinedEntity) then
+		SetEntityDrawOutline(_var.editor.outlinedEntity, false)
+	end
+	_var.editor.outlinedEntity = handle
+	if handle then
+		SetEntityDrawOutlineColor(255, 60, 60, 255)
+		SetEntityDrawOutline(handle, true)
+	end
+end
+
+---drawCrosshair → Draw a small crosshair at the center of the screen
+---@return void
+function drawCrosshair()
+	DrawRect(0.5, 0.5, 0.0025, 0.004, 255, 255, 255, 220)
+end
+
+---drawGizmo → Draw the gizmo of an entity and apply its changes
+---@param handle integer
+---@return void
+function drawGizmo(handle)
+	local forward, right, up, position = GetEntityMatrix(handle)
+	-- the matrix is given to the native as a mutable buffer: right, forward, up and position rows
+	local buffer = string.pack("<ffffffffffffffff", right.x, right.y, right.z, 0.0, forward.x, forward.y, forward.z, 0.0, up.x, up.y, up.z, 0.0, position.x, position.y, position.z, 1.0)
+	if not Citizen.InvokeNative(0xEB2EDCA2, buffer, "epyi_mapeditor", Citizen.ReturnResultAnyway()) then
+		return
+	end
+	local rx, ry, rz, _rw, fx, fy, fz, _fw, ux, uy, uz, _uw, px, py, pz = string.unpack("<ffffffffffffffff", buffer)
+	local newRight, newForward, newUp = norm(vector3(rx, ry, rz)), norm(vector3(fx, fy, fz)), norm(vector3(ux, uy, uz))
+	SetEntityMatrix(handle, newForward.x, newForward.y, newForward.z, newRight.x, newRight.y, newRight.z, newUp.x, newUp.y, newUp.z, px, py, pz)
+end
+
+---setGizmoMode → Change the mode of the gizmo ("translate" or "rotate")
+---@param mode string
+---@return void
+function setGizmoMode(mode)
+	_var.editor.gizmo.mode = mode
+	local command = mode == "rotate" and "gizmoRotation" or "gizmoTranslation"
+	ExecuteCommand("+" .. command)
+	Citizen.SetTimeout(100, function()
+		ExecuteCommand("-" .. command)
+	end)
+end
+
+---syncGizmoSpace → Make the gizmo use the entity space if the translation is relative (the world space otherwise)
+---@return void
+function syncGizmoSpace()
+	if _var.editor.gizmo.isLocal == _var.settings.relativeTranslation then
+		return
+	end
+	_var.editor.gizmo.isLocal = _var.settings.relativeTranslation
+	ExecuteCommand("+gizmoLocal")
+	Citizen.SetTimeout(100, function()
+		ExecuteCommand("-gizmoLocal")
+	end)
+end
+
+---snapEntityToGround → Put an entity on the ground
+---@param handle integer
+---@return void
+function snapEntityToGround(handle)
+	if IsEntityAVehicle(handle) then
+		SetVehicleOnGroundProperly(handle)
+	elseif IsEntityAnObject(handle) then
+		PlaceObjectOnGroundProperly(handle)
+	else
+		local coords = GetEntityCoords(handle)
+		local found, groundZ = GetGroundZFor_3dCoord(coords.x, coords.y, coords.z + 1.0, false)
+		if found then
+			SetEntityCoords(handle, coords.x, coords.y, groundZ, false, false, false, false)
+		end
+	end
+end
+
+---setCameraSpeedIndex → Change the speed of the camera
+---@param index integer
+---@return void
+function setCameraSpeedIndex(index)
+	index = math.max(1, math.min(#_var.menu.cameraSpeedArray, index))
+	_var.menu.cameraSpeedArrayIndex = index
+	_var.settings.cameraSpeed = (2 * (index - 1) / (#_var.menu.cameraSpeedArray - 1)) + 0.05
+end
+
 -- Resource stop handler
 -- clean the editor and the loaded maps when the resource stops
 AddEventHandler("onResourceStop", function(resourceName)

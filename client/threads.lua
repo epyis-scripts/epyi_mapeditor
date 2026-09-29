@@ -141,6 +141,20 @@ _threads.editor.update = function()
 	if not cam then
 		return
 	end
+	if selected and not DoesEntityExist(selected.handle) then
+		selected = nil
+	end
+
+	-- Cursor mode (used by the gizmo when an entity is selected, disabled while looking around)
+	setCursorMode(_var.editor.state == states.selected and _var.settings.useGizmo and selected ~= nil and not _var.editor.isLooking and not _var.freecam.isPaused)
+
+	-- Outline of the selected entity
+	setEntityOutline(selected and selected.handle or nil)
+
+	-- Crosshair
+	if not _var.editor.cursorMode then
+		drawCrosshair()
+	end
 
 	-- Entities counts
 	if _var.settings.showInfoBars then
@@ -148,11 +162,12 @@ _threads.editor.update = function()
 			{ _U("infobar_objects"), tostring(#_var.map.current.props) },
 			{ _U("infobar_peds"), tostring(#_var.map.current.peds) },
 			{ _U("infobar_vehicles"), tostring(#_var.map.current.vehicles) },
+			{ _U("infobar_camera_speed"), _var.menu.cameraSpeedArray[_var.menu.cameraSpeedArrayIndex] },
 		})
 	end
 
 	-- Bounding box of the selected entity
-	if _var.settings.showBoundingBox and selected and DoesEntityExist(selected.handle) then
+	if _var.settings.showBoundingBox and selected then
 		drawEntityBox(selected.handle, 255, 0, 0)
 	end
 
@@ -165,28 +180,44 @@ _threads.editor.update = function()
 				{ getInstructionalButton(Config.Controls.PedCreate), _U("button_ped") },
 				{ getInstructionalButton(Config.Controls.ObjectCreate), _U("button_object") },
 				{ getInstructionalButton(Config.Controls.SelectEntity), _U("button_select_entity") },
+				{ getInstructionalButton(Config.Controls.ScrollUp), _U("button_camera_speed") },
 			}
 		elseif _var.editor.state == states.adding then
 			buttons = {
+				{ getInstructionalButton(Config.Controls.CancelAdding), _U("button_cancel") },
 				{ getInstructionalButton(Config.Controls.RotateCW), "" },
 				{ getInstructionalButton(Config.Controls.RotateACW), _U("button_rotate") },
+				{ getInstructionalButton(Config.Controls.ScrollUp), _U("button_rotate_15") },
 				{ getInstructionalButton(Config.Controls.AlignItem), _U("button_align") },
-				{ getInstructionalButton(Config.Controls.PlaceItem), _U("button_place") },
+				{ getInstructionalButton(Config.Controls.StampModifier), _U("button_stamp") },
+				{ getInstructionalButton(Config.Controls.PlaceItem), "" },
+				{ getInstructionalButton(Config.Controls.SelectEntity), _U("button_place") },
 			}
 		elseif _var.editor.state == states.selected then
-			showHelpText(_U("helptext_selected", getControlHelpToken(Config.Controls.ChangeTranslationMode), getControlHelpToken(Config.Controls.ChangeRotationAxis), getControlHelpToken(Config.Controls.RotateOverAngle), getControlHelpToken(Config.Controls.DeselectEntity)))
+			showHelpText(
+				_U(
+					"helptext_selected",
+					getControlHelpToken(Config.Controls.ChangeTranslationMode),
+					getControlHelpToken(Config.Controls.ChangeRotationAxis),
+					getControlHelpToken(Config.Controls.RotateOverAngle),
+					getControlHelpToken(Config.Controls.FreemoveEntity),
+					getControlHelpToken(Config.Controls.SnapToGround),
+					getControlHelpToken(Config.Controls.CloneEntity)
+				)
+			)
 			buttons = {
+				{ getInstructionalButton(Config.Controls.DeselectEntity), _U("button_deselect") },
+				{ getInstructionalButton(Config.Controls.DeleteEntity), _U("button_delete") },
+				{ getInstructionalButton(Config.Controls.EditEntity), _U("button_edit_entity") },
 				{ getInstructionalButton(Config.Controls.TranslateZDown), "" },
 				{ getInstructionalButton(Config.Controls.TranslateZUp), _U("button_translate") },
 				{ getInstructionalButton(Config.Controls.RotateCW), "" },
 				{ getInstructionalButton(Config.Controls.RotateACW), _U("button_rotate_axis", _U("rotation_mode_" .. _var.editor.rotationModes[_var.editor.rotationModeIndex])) },
-				{ getInstructionalButton(Config.Controls.CloneEntity), _U("button_clone") },
-				{ getInstructionalButton(Config.Controls.DeleteEntity), _U("button_delete") },
 			}
-			if isControlPressed(Config.Controls.FreemoveEntity) then
-				table.insert(buttons, { getInstructionalButton(Config.Controls.AlignItem), _U("button_align") })
+			if _var.settings.useGizmo then
+				table.insert(buttons, { getInstructionalButton(Config.Controls.LookAround), _U("button_look_around") })
+				table.insert(buttons, { getInstructionalButton(Config.Controls.GizmoMode), _U("button_gizmo_mode", _U("gizmo_mode_" .. _var.editor.gizmo.mode)) })
 			end
-			table.insert(buttons, { getInstructionalButton(Config.Controls.FreemoveEntity), _U("button_drag_entity") })
 		end
 		local signature = ""
 		for _, button in ipairs(buttons) do
@@ -213,7 +244,7 @@ _threads.editor.update = function()
 	-- 3D cursor
 	if _var.settings.show3DCursor then
 		local maxDimensions = vector3(0.0, 0.0, 0.0)
-		if selected and DoesEntityExist(selected.handle) then
+		if selected then
 			local _minDimensions
 			_minDimensions, maxDimensions = getEntityDimensions(selected.handle)
 		end
@@ -245,7 +276,7 @@ _threads.editor.update = function()
 				else
 					drawMarker(25, cursorPosition + vector3(0.0, 0.0, 0.09), vector3(0.0, 0.0, 0.0), vector3(0.0, 0.0, 0.0), vector3(4.0, 4.0, 4.0), 255, 255, 255)
 				end
-			elseif (_var.editor.state == states.adding or _var.editor.state == states.selected) and selected and DoesEntityExist(selected.handle) then
+			elseif (_var.editor.state == states.adding or _var.editor.state == states.selected) and selected then
 				SetEntityLocallyVisible(cursorProp)
 				AttachEntityToEntity(cursorProp, selected.handle, 0, 0.0, 0.0, maxDimensions.z, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
 			end
@@ -253,7 +284,7 @@ _threads.editor.update = function()
 	end
 
 	-- XYZ axes of the selected entity
-	if _var.settings.showXYZAxis and _var.editor.state == states.selected and selected and DoesEntityExist(selected.handle) then
+	if _var.settings.showXYZAxis and _var.editor.state == states.selected and selected and not _var.settings.useGizmo then
 		local minDimensions, maxDimensions = getEntityDimensions(selected.handle)
 		local dimensions = (maxDimensions - minDimensions) / 2
 		local position = GetEntityCoords(selected.handle)
@@ -270,7 +301,7 @@ _threads.editor.update = function()
 	end
 
 	-- Rotation axis markers of the selected entity (code courtesy of Rockstar North)
-	if _var.settings.showSelectionMarker and _var.editor.state == states.selected and selected and DoesEntityExist(selected.handle) then
+	if _var.settings.showSelectionMarker and _var.editor.state == states.selected and selected then
 		local markerRotation = vector3(-90.0, 0.0, 0.0)
 		local markerScale = vector3(1.0, 1.0, 1.0)
 		local markerOffset = 1.25
@@ -310,6 +341,12 @@ _threads.editor.update = function()
 		drawMarker(0, GetOffsetFromEntityInWorldCoords(selected.handle, secondOffset.x, secondOffset.y, secondOffset.z), -axis, markerRotation, markerScale, 0, 0, 255)
 	end
 
+	-- Gizmo of the selected entity
+	if _var.editor.state == states.selected and selected and _var.settings.useGizmo then
+		syncGizmoSpace()
+		drawGizmo(selected.handle)
+	end
+
 	-- Speed control
 	local speedModifier = 0.8
 	if isControlPressed(Config.Controls.GottaGoFast) then
@@ -319,25 +356,29 @@ _threads.editor.update = function()
 	end
 
 	-- Controls
-	if _var.menus.editor.isOpened or _var.freecam.isPaused or GetFrameCount() - _var.menus.editor.closedFrame <= 1 then
+	if _var.menus.editor.isOpened or _var.freecam.isPaused or GetFrameCount() - _var.menus.closedFrame <= 1 then
 		return
 	end
 	if _var.editor.state == states.flying then
+		-- Camera speed
+		if not isSpawnMenuVisible() then
+			local scroll = (isControlJustPressed(Config.Controls.ScrollUp) and 1 or 0) - (isControlJustPressed(Config.Controls.ScrollDown) and 1 or 0)
+			if scroll ~= 0 then
+				setCameraSpeedIndex(_var.menu.cameraSpeedArrayIndex + scroll)
+			end
+		end
+
+		-- Selection
 		if isControlJustPressed(Config.Controls.SelectEntity) and hitEntity then
 			local record = mapFindEntity(hitEntity)
 			if record then
-				closeSpawnMenu()
-				if record.type ~= "prop" then
-					setupEditorEntity(record)
-				end
-				_var.editor.selected = record
-				_var.editor.state = states.selected
+				selectEntity(record)
 			end
 		end
+
+		-- Spawn menus
 		if isControlJustPressed(Config.Controls.ObjectCreate) then
-			_var.editor.state = states.adding
 			openSpawnMenu("objects")
-			selectNewObject(getSelectedPropModel())
 		end
 		if isControlJustPressed(Config.Controls.PedCreate) then
 			openSpawnMenu("peds")
@@ -346,21 +387,28 @@ _threads.editor.update = function()
 			openSpawnMenu("vehicles")
 		end
 	elseif _var.editor.state == states.adding then
-		if not selected or not DoesEntityExist(selected.handle) then
+		if not selected then
+			if isControlJustPressed(Config.Controls.CancelAdding) then
+				cancelObjectAdding(true)
+			end
 			return
 		end
 		SetEntityCoordsNoOffset(selected.handle, cursorPosition.x, cursorPosition.y, cursorPosition.z, true, true, true)
+
+		-- Cancelling
+		if isControlJustPressed(Config.Controls.CancelAdding) then
+			cancelObjectAdding(true)
+			return
+		end
 
 		-- Alignment
 		if isControlJustPressed(Config.Controls.AlignItem) then
 			alignEntity(selected.handle)
 		end
 
-		-- Placing
-		if isControlJustPressed(Config.Controls.PlaceItem) then
-			mapAddEntity(selected)
-			closeSpawnMenu()
-			_var.editor.state = states.selected
+		-- Placing (hold the stamp modifier to keep adding the same object)
+		if isControlJustPressed(Config.Controls.PlaceItem) or isControlJustPressed(Config.Controls.SelectEntity) then
+			placeObject(isControlPressed(Config.Controls.StampModifier))
 			return
 		end
 
@@ -372,13 +420,22 @@ _threads.editor.update = function()
 		if isControlPressed(Config.Controls.RotateACW) then
 			rotateEntity(selected.handle, quaternionInvert(rotation))
 		end
+		if isControlJustPressed(Config.Controls.ScrollUp) then
+			rotateEntity(selected.handle, quaternionFromYawPitchRoll(0.0, 0.0, math.rad(15.0)))
+		end
+		if isControlJustPressed(Config.Controls.ScrollDown) then
+			rotateEntity(selected.handle, quaternionFromYawPitchRoll(0.0, 0.0, math.rad(-15.0)))
+		end
 	elseif _var.editor.state == states.selected then
-		if not selected or not DoesEntityExist(selected.handle) then -- if, for some reason, the selected entity doesn't exist anymore
-			if selected and mapContainsEntity(selected) then
-				mapRemoveEntity(selected)
+		if not selected then -- if, for some reason, the selected entity doesn't exist anymore
+			if _var.editor.selected and mapContainsEntity(_var.editor.selected) then
+				mapRemoveEntity(_var.editor.selected)
 			end
 			_var.editor.selected = nil
 			_var.editor.state = states.flying
+			return
+		end
+		if isSpawnMenuVisible() then -- the controls are used by the entity menu
 			return
 		end
 
@@ -386,6 +443,26 @@ _threads.editor.update = function()
 		if isControlJustPressed(Config.Controls.DeselectEntity) then
 			deselectEntity()
 			return
+		end
+
+		-- Spawn menus (the entity is deselected first)
+		for control, menu in pairs({ [Config.Controls.ObjectCreate] = "objects", [Config.Controls.PedCreate] = "peds", [Config.Controls.VehicleCreate] = "vehicles" }) do
+			if isControlJustPressed(control) then
+				deselectEntity()
+				openSpawnMenu(menu)
+				return
+			end
+		end
+
+		-- Entity menu
+		if isControlJustPressed(Config.Controls.EditEntity) then
+			openSpawnMenu("entity")
+			return
+		end
+
+		-- Gizmo mode (translation - rotation)
+		if _var.settings.useGizmo and isControlJustPressed(Config.Controls.GizmoMode) then
+			setGizmoMode(_var.editor.gizmo.mode == "translate" and "rotate" or "translate")
 		end
 
 		-- Translation mode (relative - absolute)
@@ -399,20 +476,15 @@ _threads.editor.update = function()
 		end
 		local rotationMode = _var.editor.rotationModes[_var.editor.rotationModeIndex]
 
+		-- Snap to ground
+		if isControlJustPressed(Config.Controls.SnapToGround) then
+			snapEntityToGround(selected.handle)
+		end
+
 		-- Cloning (when the clone key is pressed, no other translation/rotation is allowed)
 		if isControlPressed(Config.Controls.CloneEntity) then
 			if isControlJustPressed(Config.Controls.TranslateYUp) or isControlJustPressed(Config.Controls.TranslateYDown) then
-				local minDimensions, maxDimensions = getEntityDimensions(selected.handle)
-				local dimensions = maxDimensions - minDimensions
-				local right, forward, up = getEntityVectors(selected.handle)
-				local movement
-				if rotationMode == "pitch" then
-					movement = right * dimensions.x
-				elseif rotationMode == "roll" then
-					movement = forward * dimensions.y
-				else
-					movement = up * dimensions.z
-				end
+				local movement = getCloneMovement(selected.handle, rotationMode)
 				if isControlJustPressed(Config.Controls.TranslateYDown) then
 					movement = -movement
 				end
@@ -480,17 +552,14 @@ _threads.editor.update = function()
 		if isControlPressed(Config.Controls.TranslateZDown) then
 			translation = translation - up
 		end
-		local newPosition = GetEntityCoords(selected.handle) + translation * speedModifier
-		SetEntityCoordsNoOffset(selected.handle, newPosition.x, newPosition.y, newPosition.z, true, true, true)
+		if translation ~= vector3(0.0, 0.0, 0.0) then
+			local newPosition = GetEntityCoords(selected.handle) + translation * speedModifier
+			SetEntityCoordsNoOffset(selected.handle, newPosition.x, newPosition.y, newPosition.z, true, true, true)
+		end
 
 		-- Deletion
 		if isControlJustPressed(Config.Controls.DeleteEntity) then
-			if mapContainsEntity(selected) then
-				mapRemoveEntity(selected)
-			end
-			deleteMapEntity(selected)
-			_var.editor.selected = nil
-			_var.editor.state = states.flying
+			deleteSelectedEntity()
 		end
 	end
 end
@@ -498,6 +567,8 @@ _threads.editor.disable = function()
 	_threads.editor.isActivated = false
 	_var.editor.state = _var.editor.states.inactive
 	_var.instructionnal.signature = nil
+	setCursorMode(false)
+	setEntityOutline(nil)
 end
 
 ---enterEditor → Enable the freecam and the editor
@@ -518,6 +589,7 @@ function exitEditor()
 		return
 	end
 	resetEditorSelection()
+	closeSpawnMenu()
 	deleteCursorProp()
 	_threads.editor.disable()
 	_threads.freecam.disable()
@@ -532,6 +604,23 @@ function deleteCursorProp()
 	_var.editor.cursorProp = nil
 end
 
+---selectEntity → Select an entity of the map
+---@param record table
+---@return void
+function selectEntity(record)
+	if _var.editor.state == _var.editor.states.adding then
+		cancelObjectAdding()
+	elseif _var.editor.state == _var.editor.states.selected then
+		deselectEntity()
+	end
+	closeSpawnMenu()
+	if record.type ~= "prop" then
+		setupEditorEntity(record)
+	end
+	_var.editor.selected = record
+	_var.editor.state = _var.editor.states.selected
+end
+
 ---deselectEntity → Deselect the selected entity
 ---@return void
 function deselectEntity()
@@ -544,13 +633,29 @@ function deselectEntity()
 	_var.editor.state = _var.editor.states.flying
 end
 
+---deleteSelectedEntity → Delete the selected entity from the map
+---@return void
+function deleteSelectedEntity()
+	local selected = _var.editor.selected
+	if not selected then
+		return
+	end
+	closeSpawnMenu()
+	if mapContainsEntity(selected) then
+		mapRemoveEntity(selected)
+	end
+	deleteMapEntity(selected)
+	_var.editor.selected = nil
+	_var.editor.state = _var.editor.states.flying
+end
+
 ---resetEditorSelection → Cancel the object being added or deselect the selected entity
 ---@return void
 function resetEditorSelection()
 	if _var.editor.state == _var.editor.states.adding then
-		closeSpawnMenu()
 		cancelObjectAdding()
 	elseif _var.editor.state == _var.editor.states.selected then
+		closeSpawnMenu()
 		deselectEntity()
 	end
 end
@@ -570,12 +675,28 @@ function alignEntity(handle)
 	end
 end
 
+---getCloneMovement → Get the offset of a clone according to the rotation axis
+---@param handle integer
+---@param rotationMode string
+---@return vector3
+function getCloneMovement(handle, rotationMode)
+	local minDimensions, maxDimensions = getEntityDimensions(handle)
+	local dimensions = maxDimensions - minDimensions
+	local right, forward, up = getEntityVectors(handle)
+	if rotationMode == "pitch" then
+		return right * dimensions.x
+	elseif rotationMode == "roll" then
+		return forward * dimensions.y
+	end
+	return up * dimensions.z
+end
+
 ---cloneEntity → Clone the selected entity with an offset and select the clone
 ---@param record table
 ---@param movement vector3
 ---@return void
 function cloneEntity(record, movement)
-	local model = GetEntityModel(record.handle)
+	local model = record.model or GetEntityModel(record.handle)
 	local position = GetEntityCoords(record.handle) + movement
 	local clone
 	if record.type == "ped" then
@@ -591,6 +712,8 @@ function cloneEntity(record, movement)
 	end
 	if clone.type ~= "prop" then
 		setupEditorEntity(clone)
+	else
+		copyEntityQuaternion(record.handle, clone.handle)
 	end
 	mapAddEntity(clone)
 	_var.editor.selected = clone

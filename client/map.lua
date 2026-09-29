@@ -146,7 +146,7 @@ function createProp(model, position, rotation, textureVariant, isNetwork, isDyna
 	SetEntityRotation(handle, rotation.x, rotation.y, rotation.z, 2, true)
 	SetObjectTextureVariant(handle, textureVariant or 0)
 	setPropEffects(handle, hash)
-	return { handle = handle, type = "prop", textureVariant = textureVariant or 0 }
+	return { handle = handle, type = "prop", model = model, textureVariant = textureVariant or 0 }
 end
 
 ---createPed → Create a ped and return its map entity
@@ -163,7 +163,7 @@ function createPed(model, position, heading, pedType, isNetwork)
 	end
 	local handle = CreatePed(pedType or 26, hash, position.x, position.y, position.z, heading, isNetwork, false)
 	SetModelAsNoLongerNeeded(hash)
-	return { handle = handle, type = "ped" }
+	return { handle = handle, type = "ped", model = model }
 end
 
 ---createVehicle → Create a vehicle and return its map entity
@@ -179,7 +179,7 @@ function createVehicle(model, position, heading, isNetwork)
 	end
 	local handle = CreateVehicle(hash, position.x, position.y, position.z, heading, isNetwork, false)
 	SetModelAsNoLongerNeeded(hash)
-	return { handle = handle, type = "vehicle" }
+	return { handle = handle, type = "vehicle", model = model }
 end
 
 ---setupEditorEntity → Freeze and protect a map entity while it is edited
@@ -259,6 +259,33 @@ function mapRemoveEntity(record)
 		RemoveBlip(record.blip)
 	end
 	record.blip = nil
+end
+
+---mapReplacePropModel → Replace the model of a prop, keeping its position, rotation and color (the record is updated in place)
+---@param record table
+---@param model string
+---@return void
+function mapReplacePropModel(record, model)
+	Citizen.CreateThread(function()
+		if not DoesEntityExist(record.handle) then
+			return
+		end
+		local position = GetEntityCoords(record.handle)
+		local rotation = GetEntityRotation(record.handle, 2)
+		local newRecord = createProp(model, position, rotation, record.textureVariant, _var.settings.networkObjects, false)
+		if not newRecord then
+			showNotification(_U("notif_entity_not_created"), 6)
+			return
+		end
+		local isInMap = mapContainsEntity(record)
+		deleteMapEntity(record)
+		record.handle = newRecord.handle
+		record.model = model
+		if isInMap then
+			record.blip = AddBlipForEntity(record.handle)
+			SetBlipColour(record.blip, 3)
+		end
+	end)
 end
 
 ---mapFindEntity → Find the map entity of an entity handle

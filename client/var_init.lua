@@ -18,15 +18,16 @@ _var = {
 _var.client.hasAccess = false
 _var.instructionnal.buttons = nil
 _var.instructionnal.signature = nil
+_var.menus.closedFrame = 0
 _var.menus.editor = {
 	isOpened = false,
-	closedFrame = 0,
 	bannerTexture = nil,
 	objects = {
 		main = nil,
 		mainMaps = nil,
 		mainMetadata = nil,
 		mainSettings = nil,
+		mainEntities = nil,
 	},
 }
 _var.menus.spawn = {
@@ -36,10 +37,16 @@ _var.menus.spawn = {
 		objects = nil,
 		peds = nil,
 		vehicles = nil,
+		entity = nil,
 	},
+	savedIndexes = {},
 }
+_var.menu.objectsFilter = ""
+_var.menu.objectsCategoryArrayIndex = 1
 _var.menu.pedsFilter = ""
+_var.menu.pedsCategoryArrayIndex = 1
 _var.menu.vehiclesFilter = ""
+_var.menu.vehiclesCategoryArrayIndex = 1
 _var.menu.cameraSpeedArrayIndex = Config.Settings.CameraSpeedIndex
 _var.menu.cameraSpeedArray = {
 	_("camera_speed_very_slow"),
@@ -48,6 +55,7 @@ _var.menu.cameraSpeedArray = {
 	_("camera_speed_fast"),
 	_("camera_speed_very_fast"),
 }
+_var.settings.useGizmo = Config.Settings.UseGizmo
 _var.settings.showRadar = Config.Settings.ShowRadar
 _var.settings.showXYZAxis = Config.Settings.ShowXYZAxis
 _var.settings.show3DCursor = Config.Settings.Show3DCursor
@@ -71,14 +79,21 @@ _var.editor.selected = nil
 _var.editor.cursorPosition = vector3(0.0, 0.0, 0.0)
 _var.editor.cursorProp = nil
 _var.editor.cursorModel = "prop_mp_placement"
+_var.editor.cursorMode = false
+_var.editor.isLooking = false
+_var.editor.outlinedEntity = nil
+_var.editor.gizmo = { mode = "translate", isLocal = false }
 _var.editor.ray = { hit = false, entity = 0, surfaceNormal = vector3(0.0, 0.0, 0.0) }
 _var.editor.controlsNames = {
 	[19] = "INPUT_CHARACTER_WHEEL",
+	[20] = "INPUT_MULTIPLAYER_INFO",
 	[21] = "INPUT_SPRINT",
 	[22] = "INPUT_JUMP",
 	[24] = "INPUT_ATTACK",
 	[25] = "INPUT_AIM",
 	[26] = "INPUT_LOOK_BEHIND",
+	[37] = "INPUT_SELECT_WEAPON",
+	[47] = "INPUT_DETONATE",
 	[45] = "INPUT_RELOAD",
 	[51] = "INPUT_CONTEXT",
 	[63] = "INPUT_VEH_MOVE_LEFT_ONLY",
@@ -101,6 +116,8 @@ _var.editor.controlsNames = {
 	[175] = "INPUT_CELLPHONE_RIGHT",
 	[176] = "INPUT_CELLPHONE_SELECT",
 	[200] = "INPUT_FRONTEND_PAUSE_ALTERNATE",
+	[241] = "INPUT_CURSOR_SCROLL_UP",
+	[242] = "INPUT_CURSOR_SCROLL_DOWN",
 	[256] = "INPUT_CREATOR_DELETE",
 }
 _var.freecam.cam = nil
@@ -112,16 +129,28 @@ _var.map.loadRequestId = 0
 _var.maps.list = {}
 _var.loader.maps = {}
 _var.loader.nextId = 1
-_var.props.categoryArrayIndex = 1
-_var.props.typeArrayIndex = 1
-_var.props.colorArrayIndex = 1
+_var.props.recent = {}
+_var.props.recentMax = 20
 _var.props.coloredCategory = "FMMC_PLIB_19"
 _var.props.coloredCategoryColors = 5
 _var.props.colorsByModel = {}
 _var.peds.isLoaded = false
 _var.peds.models = {}
+_var.peds.categories = { -- the ped models are sorted in categories with the prefix of their name
+	{ label = "peds_category_animals", prefixes = { "a_c_" } },
+	{ label = "peds_category_ambient_female", prefixes = { "a_f_" } },
+	{ label = "peds_category_ambient_male", prefixes = { "a_m_" } },
+	{ label = "peds_category_cutscene", prefixes = { "cs_", "csb_" } },
+	{ label = "peds_category_gang", prefixes = { "g_" } },
+	{ label = "peds_category_story", prefixes = { "ig_" } },
+	{ label = "peds_category_multiplayer", prefixes = { "mp_" } },
+	{ label = "peds_category_service", prefixes = { "s_" } },
+	{ label = "peds_category_unique", prefixes = { "u_" } },
+	{ label = "peds_category_other", prefixes = {} },
+}
 _var.vehicles.isLoaded = false
 _var.vehicles.models = {}
+_var.vehicles.classes = {}
 _var.props.categories = {
 	{
 		name = "MC_PRSTNT_T0",
