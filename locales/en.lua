@@ -8,14 +8,17 @@ locales["en"] = {
 	["objects_subtitle"] = "Add ~r~an object",
 	["peds_subtitle"] = "Select a ~r~ped model",
 	["vehicles_subtitle"] = "Select a ~r~vehicle model",
+	["main_entities_subtitle"] = "Entities of ~r~the map",
+	["entity_subtitle"] = "Selected ~r~entity",
 
 	-- Keys
 	["keys_menu_description"] = "~r~Open map editor menu",
+	["keys_gizmo_description"] = "~r~Map editor~s~: drag the gizmo",
+	["keys_look_description"] = "~r~Map editor~s~: look around when an entity is selected",
 
 	-- Global
 	["insuficient_permissions"] = "Sorry, but you don't have permission to do that",
 	["map_default_name"] = "Nameless Map",
-	["default"] = "Default",
 	["search"] = "Search",
 	["no_filter"] = "No filter",
 	["filter_result"] = "↓ Filter ~r~results ~s~↓",
@@ -28,11 +31,17 @@ locales["en"] = {
 	["rotation_mode_pitch"] = "Pitch",
 	["rotation_mode_roll"] = "Roll",
 	["rotation_mode_yaw"] = "Yaw",
+	["entity_type_prop"] = "Object",
+	["entity_type_ped"] = "Ped",
+	["entity_type_vehicle"] = "Vehicle",
+	["gizmo_mode_translate"] = "Move",
+	["gizmo_mode_rotate"] = "Rotate",
 
 	-- Editor → Info bars
 	["infobar_objects"] = "Objects",
 	["infobar_peds"] = "Peds",
 	["infobar_vehicles"] = "Vehicles",
+	["infobar_camera_speed"] = "Camera speed",
 
 	-- Editor → Instructionals buttons
 	["button_vehicle"] = "Vehicle",
@@ -44,10 +53,16 @@ locales["en"] = {
 	["button_align"] = "Align",
 	["button_place"] = "Place",
 	["button_translate"] = "Translate",
-	["button_clone"] = "Clone",
 	["button_delete"] = "Delete",
-	["button_drag_entity"] = "Drag entity",
-	["helptext_selected"] = "%s toggle translation mode\n%s toggle rotation axis\n%s rotate over 15°\n%s de-select",
+	["button_camera_speed"] = "Camera speed",
+	["button_cancel"] = "Cancel",
+	["button_rotate_15"] = "Rotate 15°",
+	["button_stamp"] = "Keep adding",
+	["button_deselect"] = "Deselect",
+	["button_edit_entity"] = "Edit",
+	["button_look_around"] = "Look around",
+	["button_gizmo_mode"] = "Gizmo: %s",
+	["helptext_selected"] = "%s relative/world axes\n%s rotation axis\n%s rotate over 15°\n%s (hold) move to the crosshair\n%s put on the ground\n%s + arrows clone",
 
 	-- Elements → Main menu
 	["main_menu_editor"] = "~r~Enter/Exit ~s~the editor",
@@ -62,10 +77,18 @@ locales["en"] = {
 	["main_menu_metadata_desc"] = "Set the metadata of the current map",
 	["main_menu_settings"] = "~r~Settings",
 	["main_menu_settings_desc"] = "Change the settings of the editor",
+	["main_menu_entities"] = "Entities of ~r~the map",
+	["main_menu_entities_desc"] = "List the entities of the map to find and select them",
 
 	-- Elements → Main menu → Maps
 	["main_maps_list"] = "↓ Maps saved on ~r~the server ~s~↓",
 	["main_maps_load_desc"] = "Load the map ~r~%s~s~, the current map will be removed",
+
+	-- Elements → Main menu → Entities
+	["main_entities_objects"] = "↓ Objects ~r~(%s) ~s~↓",
+	["main_entities_peds"] = "↓ Peds ~r~(%s) ~s~↓",
+	["main_entities_vehicles"] = "↓ Vehicles ~r~(%s) ~s~↓",
+	["main_entities_select_desc"] = "Move the camera to ~r~%s ~s~and select it",
 
 	-- Elements → Main menu → Metadata
 	["main_metadata_name"] = "Edit ~r~name",
@@ -92,28 +115,64 @@ locales["en"] = {
 	["main_settings_bounding_box_desc"] = "Show or hide the bounding box of the selected entity",
 	["main_settings_network_objects"] = "Network loaded objects",
 	["main_settings_network_objects_desc"] = "~o~EXPERIMENTAL~s~: Set if the created map entities should be networked",
+	["main_settings_gizmo"] = "Use the gizmo",
+	["main_settings_gizmo_desc"] = "Move and rotate the selected entity with a 3D gizmo and the mouse cursor",
 
 	-- Elements → Objects menu
 	["objects_category"] = "Category",
 	["objects_category_desc"] = "Choose the category of the object",
-	["objects_type"] = "Type",
-	["objects_type_desc"] = "Choose the object",
-	["objects_color"] = "Color",
-	["objects_color_desc"] = "Choose the color of the object",
+	["objects_filter_desc"] = "Filter the objects by name or model",
+	["objects_category_all"] = "All",
+	["objects_category_recent"] = "Recently used",
+	["objects_custom_model"] = "Custom ~r~model",
+	["objects_custom_model_desc"] = "Add any object of the game with its model name",
+	["objects_spawn_desc"] = "Add the object ~r~%s ~s~(%s) to the map",
 
 	-- Elements → Peds menu
 	["peds_filter_desc"] = "Filter the ped models by name",
 	["peds_spawn_desc"] = "Add the ped ~r~%s ~s~to the map",
+	["peds_category"] = "Category",
+	["peds_category_desc"] = "Choose the category of the peds",
+	["peds_category_all"] = "All",
+	["peds_category_animals"] = "Animals",
+	["peds_category_ambient_female"] = "Ambient women",
+	["peds_category_ambient_male"] = "Ambient men",
+	["peds_category_cutscene"] = "Cutscenes",
+	["peds_category_gang"] = "Gangs",
+	["peds_category_story"] = "Story characters",
+	["peds_category_multiplayer"] = "Multiplayer",
+	["peds_category_service"] = "Services",
+	["peds_category_unique"] = "Unique",
+	["peds_category_other"] = "Others",
 
 	-- Elements → Vehicles menu
 	["vehicles_filter_desc"] = "Filter the vehicle models by name",
 	["vehicles_spawn_desc"] = "Add the vehicle ~r~%s ~s~to the map",
+	["vehicles_category"] = "Category",
+	["vehicles_category_desc"] = "Choose the class of the vehicles",
+	["vehicles_category_all"] = "All",
+	["vehicles_category_class"] = "Class %s",
+
+	-- Elements → Entity menu
+	["entity_position"] = "Position %s",
+	["entity_position_desc"] = "Set the exact position of the entity on the %s axis",
+	["entity_rotation"] = "Rotation %s",
+	["entity_rotation_desc"] = "Set the exact rotation of the entity on the %s axis",
+	["entity_color"] = "Color",
+	["entity_color_desc"] = "Choose the color of the object",
+	["entity_snap_to_ground"] = "Put on ~r~the ground",
+	["entity_snap_to_ground_desc"] = "Put the entity on the ground",
+	["entity_duplicate"] = "~r~Duplicate",
+	["entity_duplicate_desc"] = "Create a copy of the entity next to it and select the copy",
+	["entity_delete"] = "~r~Delete",
+	["entity_delete_desc"] = "Delete the entity from the map",
 
 	-- Text entries
 	["textentry_map_name"] = "Set map name",
 	["textentry_map_creator"] = "Set map creator",
 	["textentry_map_description"] = "Set map description",
 	["textentry_search"] = "Search",
+	["textentry_model"] = "Model name",
 
 	-- Notifications
 	["notif_map_new"] = "A new map has been started",
@@ -122,6 +181,8 @@ locales["en"] = {
 	["notif_map_loaded"] = "The map ~r~%s ~s~has been loaded",
 	["notif_map_load_error"] = "Could not load map!",
 	["notif_entity_not_created"] = "The entity could not be created",
+	["notif_invalid_model"] = "The model ~r~%s ~s~is not a valid object",
+	["notif_invalid_number"] = "Invalid number",
 
 	-- Logs
 	["log_insuficient_permissions"] = "The player %s (ID: %s) tried to use the map editor without permission",

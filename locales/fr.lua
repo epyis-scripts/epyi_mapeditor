@@ -8,14 +8,17 @@ locales["fr"] = {
 	["objects_subtitle"] = "Ajouter ~r~un objet",
 	["peds_subtitle"] = "Choisir un ~r~modèle de ped",
 	["vehicles_subtitle"] = "Choisir un ~r~modèle de véhicule",
+	["main_entities_subtitle"] = "Entités de ~r~la map",
+	["entity_subtitle"] = "Entité ~r~sélectionnée",
 
 	-- Keys
 	["keys_menu_description"] = "~r~Ouvrir le menu de l'éditeur de map",
+	["keys_gizmo_description"] = "~r~Map editor~s~ : déplacer le gizmo",
+	["keys_look_description"] = "~r~Map editor~s~ : regarder autour quand une entité est sélectionnée",
 
 	-- Global
 	["insuficient_permissions"] = "Désolé, mais vous n'avez pas la permission de faire ça",
 	["map_default_name"] = "Map sans nom",
-	["default"] = "Par défaut",
 	["search"] = "Rechercher",
 	["no_filter"] = "Aucun filtre",
 	["filter_result"] = "↓ Résultats ~r~du filtre ~s~↓",
@@ -28,11 +31,17 @@ locales["fr"] = {
 	["rotation_mode_pitch"] = "Tangage",
 	["rotation_mode_roll"] = "Roulis",
 	["rotation_mode_yaw"] = "Lacet",
+	["entity_type_prop"] = "Objet",
+	["entity_type_ped"] = "Ped",
+	["entity_type_vehicle"] = "Véhicule",
+	["gizmo_mode_translate"] = "Déplacer",
+	["gizmo_mode_rotate"] = "Tourner",
 
 	-- Editor → Info bars
 	["infobar_objects"] = "Objets",
 	["infobar_peds"] = "Peds",
 	["infobar_vehicles"] = "Véhicules",
+	["infobar_camera_speed"] = "Vitesse caméra",
 
 	-- Editor → Instructionals buttons
 	["button_vehicle"] = "Véhicule",
@@ -44,10 +53,16 @@ locales["fr"] = {
 	["button_align"] = "Aligner",
 	["button_place"] = "Placer",
 	["button_translate"] = "Déplacer",
-	["button_clone"] = "Cloner",
 	["button_delete"] = "Supprimer",
-	["button_drag_entity"] = "Glisser l'entité",
-	["helptext_selected"] = "%s changer le mode de déplacement\n%s changer l'axe de rotation\n%s tourner de 15°\n%s désélectionner",
+	["button_camera_speed"] = "Vitesse caméra",
+	["button_cancel"] = "Annuler",
+	["button_rotate_15"] = "Tourner de 15°",
+	["button_stamp"] = "Continuer à ajouter",
+	["button_deselect"] = "Désélectionner",
+	["button_edit_entity"] = "Modifier",
+	["button_look_around"] = "Regarder autour",
+	["button_gizmo_mode"] = "Gizmo : %s",
+	["helptext_selected"] = "%s axes relatifs/monde\n%s axe de rotation\n%s tourner de 15°\n%s (maintenir) déplacer au viseur\n%s poser au sol\n%s + flèches cloner",
 
 	-- Elements → Main menu
 	["main_menu_editor"] = "~r~Entrer/Sortir ~s~de l'éditeur",
@@ -62,10 +77,18 @@ locales["fr"] = {
 	["main_menu_metadata_desc"] = "Définir les métadonnées de la map actuelle",
 	["main_menu_settings"] = "~r~Paramètres",
 	["main_menu_settings_desc"] = "Modifier les paramètres de l'éditeur",
+	["main_menu_entities"] = "Entités de ~r~la map",
+	["main_menu_entities_desc"] = "Lister les entités de la map pour les retrouver et les sélectionner",
 
 	-- Elements → Main menu → Maps
 	["main_maps_list"] = "↓ Maps sauvegardées sur ~r~le serveur ~s~↓",
 	["main_maps_load_desc"] = "Charger la map ~r~%s~s~, la map actuelle sera supprimée",
+
+	-- Elements → Main menu → Entities
+	["main_entities_objects"] = "↓ Objets ~r~(%s) ~s~↓",
+	["main_entities_peds"] = "↓ Peds ~r~(%s) ~s~↓",
+	["main_entities_vehicles"] = "↓ Véhicules ~r~(%s) ~s~↓",
+	["main_entities_select_desc"] = "Déplacer la caméra vers ~r~%s ~s~et la sélectionner",
 
 	-- Elements → Main menu → Metadata
 	["main_metadata_name"] = "Modifier ~r~le nom",
@@ -92,28 +115,64 @@ locales["fr"] = {
 	["main_settings_bounding_box_desc"] = "Afficher ou masquer la boîte englobante de l'entité sélectionnée",
 	["main_settings_network_objects"] = "Synchroniser les entités",
 	["main_settings_network_objects_desc"] = "~o~EXPÉRIMENTAL~s~ : Définir si les entités créées pour la map doivent être synchronisées en réseau",
+	["main_settings_gizmo"] = "Utiliser le gizmo",
+	["main_settings_gizmo_desc"] = "Déplacer et tourner l'entité sélectionnée avec un gizmo 3D et le curseur de la souris",
 
 	-- Elements → Objects menu
 	["objects_category"] = "Catégorie",
 	["objects_category_desc"] = "Choisir la catégorie de l'objet",
-	["objects_type"] = "Type",
-	["objects_type_desc"] = "Choisir l'objet",
-	["objects_color"] = "Couleur",
-	["objects_color_desc"] = "Choisir la couleur de l'objet",
+	["objects_filter_desc"] = "Filtrer les objets par nom ou par modèle",
+	["objects_category_all"] = "Tous",
+	["objects_category_recent"] = "Utilisés récemment",
+	["objects_custom_model"] = "Modèle ~r~personnalisé",
+	["objects_custom_model_desc"] = "Ajouter n'importe quel objet du jeu avec le nom de son modèle",
+	["objects_spawn_desc"] = "Ajouter l'objet ~r~%s ~s~(%s) à la map",
 
 	-- Elements → Peds menu
 	["peds_filter_desc"] = "Filtrer les modèles de ped par nom",
 	["peds_spawn_desc"] = "Ajouter le ped ~r~%s ~s~à la map",
+	["peds_category"] = "Catégorie",
+	["peds_category_desc"] = "Choisir la catégorie des peds",
+	["peds_category_all"] = "Tous",
+	["peds_category_animals"] = "Animaux",
+	["peds_category_ambient_female"] = "Femmes ambiantes",
+	["peds_category_ambient_male"] = "Hommes ambiants",
+	["peds_category_cutscene"] = "Cinématiques",
+	["peds_category_gang"] = "Gangs",
+	["peds_category_story"] = "Personnages de l'histoire",
+	["peds_category_multiplayer"] = "Multijoueur",
+	["peds_category_service"] = "Services",
+	["peds_category_unique"] = "Uniques",
+	["peds_category_other"] = "Autres",
 
 	-- Elements → Vehicles menu
 	["vehicles_filter_desc"] = "Filtrer les modèles de véhicule par nom",
 	["vehicles_spawn_desc"] = "Ajouter le véhicule ~r~%s ~s~à la map",
+	["vehicles_category"] = "Catégorie",
+	["vehicles_category_desc"] = "Choisir la classe des véhicules",
+	["vehicles_category_all"] = "Tous",
+	["vehicles_category_class"] = "Classe %s",
+
+	-- Elements → Entity menu
+	["entity_position"] = "Position %s",
+	["entity_position_desc"] = "Définir la position exacte de l'entité sur l'axe %s",
+	["entity_rotation"] = "Rotation %s",
+	["entity_rotation_desc"] = "Définir la rotation exacte de l'entité sur l'axe %s",
+	["entity_color"] = "Couleur",
+	["entity_color_desc"] = "Choisir la couleur de l'objet",
+	["entity_snap_to_ground"] = "Poser ~r~au sol",
+	["entity_snap_to_ground_desc"] = "Poser l'entité sur le sol",
+	["entity_duplicate"] = "~r~Dupliquer",
+	["entity_duplicate_desc"] = "Créer une copie de l'entité à côté d'elle et sélectionner la copie",
+	["entity_delete"] = "~r~Supprimer",
+	["entity_delete_desc"] = "Supprimer l'entité de la map",
 
 	-- Text entries
 	["textentry_map_name"] = "Nom de la map",
 	["textentry_map_creator"] = "Créateur de la map",
 	["textentry_map_description"] = "Description de la map",
 	["textentry_search"] = "Rechercher",
+	["textentry_model"] = "Nom du modèle",
 
 	-- Notifications
 	["notif_map_new"] = "Une nouvelle map a été commencée",
@@ -122,6 +181,8 @@ locales["fr"] = {
 	["notif_map_loaded"] = "La map ~r~%s ~s~a été chargée",
 	["notif_map_load_error"] = "Impossible de charger la map !",
 	["notif_entity_not_created"] = "L'entité n'a pas pu être créée",
+	["notif_invalid_model"] = "Le modèle ~r~%s ~s~n'est pas un objet valide",
+	["notif_invalid_number"] = "Nombre invalide",
 
 	-- Logs
 	["log_insuficient_permissions"] = "Le joueur %s (ID : %s) a essayé d'utiliser l'éditeur de map sans permission",
