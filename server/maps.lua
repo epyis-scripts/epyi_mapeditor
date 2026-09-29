@@ -54,7 +54,8 @@ RegisterNetEvent("epyi_mapeditor:saveMap", function(data)
 		TriggerClientEvent("epyi_mapeditor:saveMapResult", source, false)
 		return
 	end
-	local root = xmlParse(data)
+	local parsed, root = pcall(xmlParse, data)
+	root = parsed and root or nil
 	local nameElement = root and xmlDescendant(root, "Name")
 	local fileName = nameElement and sanitizeFileName(nameElement.text) or ""
 	if fileName == "" then
@@ -86,7 +87,7 @@ RegisterNetEvent("epyi_mapeditor:loadMap", function(fileName)
 		return
 	end
 	log(_("log_map_sending", GetPlayerName(source), fileName, math.floor(#data / 1000)))
-	TriggerClientEvent("epyi_mapeditor:mapLoaded", source, data)
+	TriggerLatentClientEvent("epyi_mapeditor:mapLoaded", source, Config.Maps.TransferSpeed, data)
 end)
 
 AddEventHandler("playerJoining", function()

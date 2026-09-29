@@ -20,13 +20,77 @@ function updateAccess(source)
 	end
 end
 
+local accents = {
+	["à"] = "a",
+	["á"] = "a",
+	["â"] = "a",
+	["ã"] = "a",
+	["ä"] = "a",
+	["å"] = "a",
+	["À"] = "a",
+	["Á"] = "a",
+	["Â"] = "a",
+	["Ã"] = "a",
+	["Ä"] = "a",
+	["Å"] = "a",
+	["è"] = "e",
+	["é"] = "e",
+	["ê"] = "e",
+	["ë"] = "e",
+	["È"] = "e",
+	["É"] = "e",
+	["Ê"] = "e",
+	["Ë"] = "e",
+	["ì"] = "i",
+	["í"] = "i",
+	["î"] = "i",
+	["ï"] = "i",
+	["Ì"] = "i",
+	["Í"] = "i",
+	["Î"] = "i",
+	["Ï"] = "i",
+	["ò"] = "o",
+	["ó"] = "o",
+	["ô"] = "o",
+	["õ"] = "o",
+	["ö"] = "o",
+	["Ò"] = "o",
+	["Ó"] = "o",
+	["Ô"] = "o",
+	["Õ"] = "o",
+	["Ö"] = "o",
+	["ù"] = "u",
+	["ú"] = "u",
+	["û"] = "u",
+	["ü"] = "u",
+	["Ù"] = "u",
+	["Ú"] = "u",
+	["Û"] = "u",
+	["Ü"] = "u",
+	["ç"] = "c",
+	["Ç"] = "c",
+	["ñ"] = "n",
+	["Ñ"] = "n",
+	["ý"] = "y",
+	["ÿ"] = "y",
+	["Ý"] = "y",
+	["œ"] = "oe",
+	["Œ"] = "oe",
+	["æ"] = "ae",
+	["Æ"] = "ae",
+	["ß"] = "ss",
+}
+
 ---sanitizeFileName
 ---@param name string
 ---@return string
 ---@public
 function sanitizeFileName(name)
-	local fileName = name:gsub('[\\/:%*%?"<>|%c]', ""):lower():gsub(" ", "-"):gsub("%-%-+", "-")
-	fileName = fileName:gsub("^[%.%s]+", ""):gsub("[%.%s]+$", "")
+	local fileName = name:gsub(utf8.charpattern, function(char)
+		return accents[char]
+	end)
+	fileName = fileName:lower():gsub("[%s_]", "-"):gsub("[^%w%-]", ""):gsub("%-%-+", "-")
+	fileName = fileName:gsub("^%-+", ""):gsub("%-+$", "")
 	return fileName
 end
 
@@ -35,7 +99,7 @@ end
 ---@return boolean
 ---@public
 function isValidFileName(fileName)
-	return type(fileName) == "string" and fileName:match('^[^\\/:%*%?"<>|%c]+%.xml$') ~= nil and not fileName:find("..", 1, true)
+	return type(fileName) == "string" and fileName:match("^[%w%-_ %.%(%)]+%.xml$") ~= nil and not fileName:find("..", 1, true)
 end
 
 ---getMapsFiles
